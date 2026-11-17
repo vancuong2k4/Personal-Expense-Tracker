@@ -36,23 +36,11 @@ const createWallet = async (userId, { name, type, balance = 0, currency = 'VND' 
 }
 
 // ============================================================
-// UPDATE — Cập nhật thông tin ví
+// UPDATE — Cập nhật thông tin ví (1-step, atomic)
 // ============================================================
 const updateWallet = async (userId, walletId, { name, type, balance, currency }) => {
-  // Luôn kiểm tra ví thuộc về user này không — tránh IDOR attack
-  // IDOR = Insecure Direct Object Reference: truy cập tài nguyên của người khác qua ID
-  const check = await db.query(
-    'SELECT id FROM wallets WHERE id = $1 AND user_id = $2',
-    [walletId, userId]
-  )
-  if (check.rows.length === 0) {
-    const error = new Error('Không tìm thấy ví hoặc bạn không có quyền truy cập')
-    error.statusCode = 404
-    throw error
-  }
-
-  // Chỉ cập nhật các trường được gửi lên (partial update)
-  // Dùng COALESCE: nếu giá trị mới là NULL thì giữ nguyên giá trị cũ
+  // 1 câu query duy nhất: vừa check ownership vừa update
+  // Nếu rowCount = 0 → ví không tồn tại hoặc không thuộc về user
   const result = await db.query(
     `UPDATE wallets
      SET name     = COALESCE($1, name),
@@ -63,6 +51,11 @@ const updateWallet = async (userId, walletId, { name, type, balance, currency })
      RETURNING id, name, type, balance, currency, created_at`,
     [name, type, balance, currency, walletId, userId]
   )
+  if (result.rowCount === 0) {
+    const error = new Error('Không tìm thấy ví hoặc bạn không có quyền truy cập')
+    error.statusCode = 404
+    throw error
+  }
   return result.rows[0]
 }
 

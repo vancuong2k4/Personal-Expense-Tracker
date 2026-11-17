@@ -1,6 +1,4 @@
-import axios from 'axios'
+import api from './axiosInstance'
 
-const API_URL = import.meta.env.VITE_API_BASE_URL
-
-export const register = (data) => axios.post(`${API_URL}/auth/register`, data)
-export const login = (data) => axios.post(`${API_URL}/auth/login`, data)
+export const register = (data) => api.post('/auth/register', data)
+export const login    = (data) => api.post('/auth/login', data)
