@@ -6,6 +6,7 @@ const walletRoutes      = require('./routes/walletRoutes')
 const transactionRoutes = require('./routes/transactionRoutes')
 const statsRoutes       = require('./routes/statsRoutes')
 const categoryRoutes    = require('./routes/categoryRoutes')
+const budgetRoutes      = require('./routes/budgetRoutes')
 const errorHandler      = require('./middlewares/errorHandler')
 
 const app = express()
@@ -19,6 +20,7 @@ app.use('/api/wallets',      walletRoutes)
 app.use('/api/transactions', transactionRoutes)
 app.use('/api/stats',        statsRoutes)
 app.use('/api/categories',   categoryRoutes)
+app.use('/api/budgets',      budgetRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', timestamp: new Date() }))
