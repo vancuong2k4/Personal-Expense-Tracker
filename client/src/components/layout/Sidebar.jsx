@@ -5,6 +5,7 @@ const navItems = [
   { to: '/dashboard',    icon: '📊', label: 'Tổng quan' },
   { to: '/wallets',      icon: '👛', label: 'Ví của tôi' },
   { to: '/transactions', icon: '💸', label: 'Giao dịch' },
+  { to: '/budgets',      icon: '🎯', label: 'Ngân sách' },
 ]
 
 export default function Sidebar() {

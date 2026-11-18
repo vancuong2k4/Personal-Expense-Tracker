@@ -94,6 +94,31 @@ export default function DashboardPage() {
         )
       }
 
+      {/* ── Quick Nav Links ─────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <Link to="/transactions" className="flex items-center gap-3 p-3.5 bg-white border border-gray-100 rounded-xl hover:border-blue-300 hover:shadow-sm transition-all group">
+          <span className="text-2xl group-hover:scale-110 transition-transform">💸</span>
+          <div>
+            <p className="text-sm font-semibold text-gray-800">Ghi chép giao dịch</p>
+            <p className="text-xs text-gray-400">Theo dõi dòng tiền thu chi</p>
+          </div>
+        </Link>
+        <Link to="/budgets" className="flex items-center gap-3 p-3.5 bg-white border border-gray-100 rounded-xl hover:border-blue-300 hover:shadow-sm transition-all group">
+          <span className="text-2xl group-hover:scale-110 transition-transform">🎯</span>
+          <div>
+            <p className="text-sm font-semibold text-gray-800">Quản lý ngân sách</p>
+            <p className="text-xs text-gray-400">Hạn mức chi tiêu theo tháng</p>
+          </div>
+        </Link>
+        <Link to="/wallets" className="flex items-center gap-3 p-3.5 bg-white border border-gray-100 rounded-xl hover:border-blue-300 hover:shadow-sm transition-all group">
+          <span className="text-2xl group-hover:scale-110 transition-transform">👛</span>
+          <div>
+            <p className="text-sm font-semibold text-gray-800">Quản lý ví tài khoản</p>
+            <p className="text-xs text-gray-400">Theo dõi số dư các tài khoản</p>
+          </div>
+        </Link>
+      </div>
+
       {/* ── Monthly Bar Chart ───────────────────────────────── */}
       <div className="bg-white border border-gray-100 rounded-2xl p-6 mb-5">
         <div className="flex items-center justify-between mb-5">
