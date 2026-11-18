@@ -11,6 +11,7 @@ import LoadingSpinner              from '../components/common/LoadingSpinner'
 import Pagination                  from '../components/common/Pagination'
 import EmptyState                  from '../components/common/EmptyState'
 import { formatCurrency }          from '../utils/formatCurrency'
+import { exportTransactionsToCSV } from '../utils/exportCSV'
 
 export default function TransactionsPage() {
   const {
@@ -75,6 +76,15 @@ export default function TransactionsPage() {
           <p className="text-gray-500 text-sm mt-0.5">Theo dõi mọi khoản thu chi</p>
         </div>
         <div className="flex items-center gap-3">
+          {transactions.length > 0 && (
+            <button
+              onClick={() => exportTransactionsToCSV(transactions)}
+              className="flex items-center gap-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-3.5 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
+              title="Xuất danh sách ra file CSV"
+            >
+              📥 Xuất CSV
+            </button>
+          )}
           <TransactionFilter wallets={wallets} categories={categories} onApply={handleFilter} />
           <button onClick={openCreate}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
