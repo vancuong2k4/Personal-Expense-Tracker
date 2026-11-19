@@ -6,6 +6,7 @@ const navItems = [
   { to: '/wallets',      icon: '👛', label: 'Ví của tôi' },
   { to: '/transactions', icon: '💸', label: 'Giao dịch' },
   { to: '/budgets',      icon: '🎯', label: 'Ngân sách' },
+  { to: '/profile',      icon: '⚙️', label: 'Tài khoản' },
 ]
 
 export default function Sidebar() {
@@ -43,17 +44,23 @@ export default function Sidebar() {
 
       {/* User info + Logout */}
       <div className="px-4 py-4 border-t border-gray-100">
-        <div className="flex items-center gap-3 px-2 mb-3">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-semibold text-sm">
+        <NavLink
+          to="/profile"
+          className="flex items-center gap-3 px-2 py-1.5 mb-2 rounded-lg hover:bg-gray-50 transition-colors group"
+        >
+          <div className="w-8 h-8 bg-blue-100 group-hover:bg-blue-200 rounded-full flex items-center justify-center text-blue-700 font-semibold text-sm transition-colors">
             {user?.email?.[0]?.toUpperCase()}
           </div>
-          <span className="text-sm text-gray-700 truncate">{user?.email}</span>
-        </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-gray-800 truncate">{user?.full_name || 'Tài khoản'}</p>
+            <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
+          </div>
+        </NavLink>
         <button
           onClick={logout}
-          className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+          className="w-full text-left px-3 py-1.5 text-xs text-red-500 hover:bg-red-50 rounded-lg transition-colors font-medium flex items-center gap-2"
         >
-          🚪 Đăng xuất
+          <span>🚪</span> Đăng xuất
         </button>
       </div>
     </aside>

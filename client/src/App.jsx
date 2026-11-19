@@ -5,6 +5,7 @@ import DashboardPage from './pages/DashboardPage'
 import WalletsPage from './pages/WalletsPage'
 import TransactionsPage from './pages/TransactionsPage'
 import BudgetsPage from './pages/BudgetsPage'
+import ProfilePage from './pages/ProfilePage'
 import ProtectedRoute from './components/layout/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 
@@ -23,6 +24,7 @@ function App() {
             <Route path="/wallets" element={<WalletsPage />} />
             <Route path="/transactions" element={<TransactionsPage />} />
             <Route path="/budgets" element={<BudgetsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Default redirect */}
