@@ -105,4 +105,113 @@ const signToken = (userId, email) => {
   )
 }
 
-module.exports = { registerUser, loginUser }
+// ============================================================
+// PROFILE & SECURITY
+// ============================================================
+/**
+ * Lấy thông tin tài khoản người dùng kèm số liệu thống kê cơ bản
+ */
+const getUserProfile = async (userId) => {
+  const userResult = await db.query(
+    'SELECT id, email, full_name, created_at FROM users WHERE id = $1',
+    [userId]
+  )
+  if (userResult.rows.length === 0) {
+    const error = new Error('Người dùng không tồn tại')
+    error.statusCode = 404
+    throw error
+  }
+
+  const [walletsCount, txCount] = await Promise.all([
+    db.query('SELECT COUNT(*)::int AS count FROM wallets WHERE user_id = $1', [userId]),
+    db.query('SELECT COUNT(*)::int AS count FROM transactions WHERE user_id = $1', [userId]),
+  ])
+
+  return {
+    ...userResult.rows[0],
+    wallet_count: walletsCount.rows[0].count,
+    transaction_count: txCount.rows[0].count,
+  }
+}
+
+/**
+ * Cập nhật thông tin hồ sơ (Họ tên)
+ */
+const updateProfile = async (userId, { full_name }) => {
+  if (!full_name || full_name.trim().length === 0) {
+    const error = new Error('Họ và tên không được để trống')
+    error.statusCode = 400
+    throw error
+  }
+
+  const result = await db.query(
+    `UPDATE users
+     SET full_name = $1
+     WHERE id = $2
+     RETURNING id, email, full_name, created_at`,
+    [full_name.trim(), userId]
+  )
+
+  if (result.rows.length === 0) {
+    const error = new Error('Người dùng không tồn tại')
+    error.statusCode = 404
+    throw error
+  }
+
+  return result.rows[0]
+}
+
+/**
+ * Đổi mật khẩu
+ */
+const changePassword = async (userId, { current_password, new_password }) => {
+  if (!current_password || !new_password) {
+    const error = new Error('Vui lòng nhập mật khẩu hiện tại và mật khẩu mới')
+    error.statusCode = 400
+    throw error
+  }
+
+  if (new_password.length < 6) {
+    const error = new Error('Mật khẩu mới phải có ít nhất 6 ký tự')
+    error.statusCode = 400
+    throw error
+  }
+
+  // 1. Lấy password_hash hiện tại
+  const userResult = await db.query(
+    'SELECT password_hash FROM users WHERE id = $1',
+    [userId]
+  )
+  if (userResult.rows.length === 0) {
+    const error = new Error('Người dùng không tồn tại')
+    error.statusCode = 404
+    throw error
+  }
+
+  // 2. Kiểm tra mật khẩu hiện tại
+  const isMatch = await bcrypt.compare(current_password, userResult.rows[0].password_hash)
+  if (!isMatch) {
+    const error = new Error('Mật khẩu hiện tại không chính xác')
+    error.statusCode = 400
+    throw error
+  }
+
+  // 3. Hash mật khẩu mới và lưu vào DB
+  const salt = await bcrypt.genSalt(12)
+  const newHash = await bcrypt.hash(new_password, salt)
+
+  await db.query(
+    'UPDATE users SET password_hash = $1 WHERE id = $2',
+    [newHash, userId]
+  )
+
+  return { message: 'Đổi mật khẩu thành công' }
+}
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getUserProfile,
+  updateProfile,
+  changePassword,
+}

@@ -1,4 +1,10 @@
-const { registerUser, loginUser } = require('../services/authService')
+const {
+  registerUser,
+  loginUser,
+  getUserProfile,
+  updateProfile,
+  changePassword,
+} = require('../services/authService')
 
 /**
  * Controller chỉ làm đúng 1 việc:
@@ -50,6 +56,41 @@ exports.login = async (req, res, next) => {
       token,
       user,
     })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// GET /api/auth/profile
+exports.getProfile = async (req, res, next) => {
+  try {
+    const profile = await getUserProfile(req.user.id)
+    res.json(profile)
+  } catch (err) {
+    next(err)
+  }
+}
+
+// PUT /api/auth/profile
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const { full_name } = req.body
+    const updated = await updateProfile(req.user.id, { full_name })
+    res.json({
+      message: 'Cập nhật thông tin thành công',
+      user: updated,
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// PUT /api/auth/change-password
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { current_password, new_password } = req.body
+    const result = await changePassword(req.user.id, { current_password, new_password })
+    res.json(result)
   } catch (err) {
     next(err)
   }
