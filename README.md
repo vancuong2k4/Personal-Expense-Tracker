@@ -2,7 +2,7 @@
 
 # 💰 Personal Expense Tracker
 
-**Ứng dụng quản lý tài chính cá nhân toàn diện** — Theo dõi thu chi, quản lý số dư ví, thiết lập ngân sách danh mục và phân tích tài chính với biểu đồ trực quan.
+**Ứng dụng quản lý tài chính cá nhân toàn diện** — Theo dõi thu chi, quản lý số dư ví, luân chuyển dòng tiền nội bộ, thiết lập ngân sách danh mục và phân tích tài chính với biểu đồ trực quan.
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev)
@@ -20,12 +20,14 @@
 | Tính năng | Mô tả |
 |-----------|-------|
 | 🔐 **Xác thực** | Đăng ký / Đăng nhập với JWT, tự động logout khi token hết hạn |
-| 👛 **Quản lý ví** | Tạo và quản lý nhiều ví (Tiền mặt, Ngân hàng, Thẻ tín dụng) |
+| 👛 **Quản lý ví** | Tạo và quản lý nhiều ví (Tiền mặt, Ngân hàng, Thẻ tín dụng) với số dư theo thời gian thực |
+| 🔄 **Chuyển tiền giữa các ví** | Luân chuyển dòng tiền giữa 2 ví (rút tiền mặt, thanh toán thẻ...), hỗ trợ phí chuyển và hoàn tác số dư nguyên tử |
 | 💸 **Giao dịch** | Ghi chép thu/chi với danh mục, ghi chú, tự động cập nhật số dư ví nguyên tử |
 | 🎯 **Quản lý Ngân sách** | Thiết lập hạn mức chi tiêu hàng tháng theo từng danh mục, theo dõi thanh tiến độ & cảnh báo vượt ngân sách |
 | 📥 **Xuất báo cáo CSV** | Xuất dữ liệu giao dịch ra file CSV chuẩn UTF-8 BOM, tương thích hoàn toàn tiếng Việt trên Excel |
 | 🔍 **Lọc & tìm kiếm** | Lọc giao dịch theo ví, danh mục, loại (thu/chi), khoảng thời gian và phân trang linh hoạt |
 | 📊 **Thống kê & Biểu đồ** | Biểu đồ cột thu/chi 6 tháng, biểu đồ tròn phân bổ chi tiêu theo danh mục với Recharts |
+| ⚙️ **Hồ sơ & Bảo mật** | Cập nhật thông tin tài khoản, thống kê số ví/giao dịch sở hữu, đổi mật khẩu bảo mật mã hóa bcrypt |
 | 📱 **Responsive** | Giao diện hiện đại, tối ưu trải nghiệm trên mọi kích thước màn hình |
 
 ---
@@ -55,34 +57,36 @@ personal-expense-tracker/
 │   └── src/
 │       ├── api/                     # Axios API calls
 │       │   ├── axiosInstance.js     # Base instance + request/response interceptors
-│       │   ├── authApi.js
-│       │   ├── walletApi.js
-│       │   ├── transactionApi.js
-│       │   ├── categoryApi.js
-│       │   ├── statsApi.js
-│       │   └── budgetApi.js
+│       │   ├── authApi.js           # Login, Register, Profile, Change Password
+│       │   ├── walletApi.js         # CRUD Wallets
+│       │   ├── transactionApi.js    # CRUD Transactions
+│       │   ├── categoryApi.js       # Categories
+│       │   ├── statsApi.js          # Stats & Charts data
+│       │   ├── budgetApi.js         # Budgets CRUD
+│       │   └── transferApi.js       # Wallet Transfers
 │       ├── components/
 │       │   ├── common/              # Button, Modal, Pagination, EmptyState, Badge, ConfirmDialog
 │       │   ├── charts/              # MonthlyChart, CategoryChart (Recharts)
 │       │   ├── layout/              # Sidebar, MainLayout, ProtectedRoute
 │       │   ├── transactions/        # TransactionForm, List, Item, Filter
-│       │   ├── wallets/             # WalletCard, WalletForm
+│       │   ├── wallets/             # WalletCard, WalletForm, TransferModal
 │       │   └── budgets/             # BudgetCard, BudgetForm, BudgetOverview
 │       ├── context/                 # AuthContext (quản lý phiên đăng nhập toàn cục)
 │       ├── hooks/                   # useAuth, useWallets, useTransactions, useStats, useBudgets, useCategories
-│       ├── pages/                   # DashboardPage, WalletsPage, TransactionsPage, BudgetsPage, Auth
+│       ├── pages/                   # DashboardPage, WalletsPage, TransactionsPage, BudgetsPage, ProfilePage, Auth
 │       └── utils/                   # formatCurrency, formatDate, groupByDate, exportCSV
 │
 └── server/                          # Express Backend
     ├── database/
     │   ├── init.sql                 # Toàn bộ schema DDL + seed data
-    │   └── migration_budgets.sql    # Script bổ sung bảng budgets
+    │   ├── migration_budgets.sql    # Script bổ sung bảng budgets
+    │   └── migration_transfers.sql  # Script bổ sung bảng transfers
     └── src/
         ├── config/db.js             # PostgreSQL connection pool & query wrapper
         ├── middlewares/             # authMiddleware (JWT), errorHandler
-        ├── routes/                  # authRoutes, walletRoutes, transactionRoutes, statsRoutes, categoryRoutes, budgetRoutes
+        ├── routes/                  # authRoutes, walletRoutes, transactionRoutes, statsRoutes, categoryRoutes, budgetRoutes, transferRoutes
         ├── controllers/             # Controller layer: validate request → gọi service → trả JSON
-        └── services/                # Business logic layer + database queries
+        └── services/                # Business logic layer + atomic database transactions
 ```
 
 ---
@@ -95,11 +99,13 @@ wallets       -- Ví của user (uuid PK, user_id FK, name, type, balance)
 categories    -- Danh mục thu/chi (SERIAL PK, name, type, icon, is_default)
 transactions  -- Giao dịch (uuid PK, user_id, wallet_id, category_id, type, amount)
 budgets       -- Ngân sách chi tiêu tháng (uuid PK, user_id, category_id, amount, month)
+transfers     -- Chuyển tiền giữa các ví (uuid PK, user_id, from_wallet_id, to_wallet_id, amount, fee)
 ```
 
 **Ràng buộc & Quan hệ:**
 - `users` → `wallets` → `transactions` ← `categories`
 - `users` & `categories` → `budgets` với ràng buộc duy nhất `UNIQUE (user_id, category_id, month)`
+- `wallets` (nguồn & đích) → `transfers` với kiểm tra ràng buộc `CONSTRAINT check_different_wallets CHECK (from_wallet_id <> to_wallet_id)`
 - Tất cả khóa ngoại liên kết với `ON DELETE CASCADE` đảm bảo toàn vẹn dữ liệu.
 
 ---
@@ -178,12 +184,15 @@ npm run dev
 
 ## 📡 API Reference
 
-### Authentication
+### Authentication & Profile
 
 | Method | Endpoint | Mô tả | Auth |
 |--------|----------|-------|------|
 | `POST` | `/api/auth/register` | Đăng ký tài khoản | ❌ |
 | `POST` | `/api/auth/login` | Đăng nhập, nhận JWT | ❌ |
+| `GET` | `/api/auth/profile` | Xem thông tin tài khoản & thống kê số ví/giao dịch | ✅ |
+| `PUT` | `/api/auth/profile` | Cập nhật thông tin cá nhân (Họ tên) | ✅ |
+| `PUT` | `/api/auth/change-password` | Đổi mật khẩu bảo mật (verify mật khẩu cũ) | ✅ |
 
 ### Wallets
 
@@ -193,6 +202,14 @@ npm run dev
 | `POST` | `/api/wallets` | Tạo ví mới | ✅ |
 | `PUT` | `/api/wallets/:id` | Cập nhật thông tin ví | ✅ |
 | `DELETE` | `/api/wallets/:id` | Xóa ví | ✅ |
+
+### Wallet Transfers (Chuyển tiền giữa các ví)
+
+| Method | Endpoint | Mô tả | Auth |
+|--------|----------|-------|------|
+| `POST` | `/api/transfers` | Chuyển tiền giữa 2 ví (trừ ví nguồn + phí, cộng ví đích) | ✅ |
+| `GET` | `/api/transfers` | Lấy lịch sử chuyển tiền phân trang `?page=1&limit=20` | ✅ |
+| `DELETE` | `/api/transfers/:id` | Hủy lượt chuyển tiền & tự động hoàn trả số dư nguyên tử | ✅ |
 
 ### Transactions
 
@@ -238,7 +255,7 @@ npm run dev
 - **Phòng chống SQL Injection** — Sử dụng 100% Parameterized Queries (`$1, $2...`) thông qua PostgreSQL connection pool.
 - **Phòng chống IDOR (Insecure Direct Object Reference)** — Mọi truy vấn đọc/ghi/sửa/xóa đều bắt buộc đối chiếu với `user_id` giải mã từ JWT của người dùng hiện tại.
 - **Xác thực phiên tập trung** — `authMiddleware` xác thực Bearer JWT trước khi chuyển tiếp vào các API tài nguyên được bảo vệ.
-- **Tính toàn vẹn dữ liệu (Atomic Transactions)** — Sử dụng `BEGIN / COMMIT / ROLLBACK` của PostgreSQL khi tạo/sửa/xóa giao dịch để bảo đảm số dư ví luôn đồng bộ.
+- **Tính toàn vẹn dữ liệu (Atomic Multi-wallet Transactions)** — Sử dụng `BEGIN / COMMIT / ROLLBACK` của PostgreSQL khi tạo/sửa/xóa giao dịch hoặc chuyển quỹ giữa 2 ví, bảo đảm không bao giờ xảy ra lỗi sai lệch số dư.
 - **Chống Email Enumeration** — Thông báo lỗi đăng nhập đồng nhất ("Email hoặc mật khẩu không đúng") để tránh việc kẻ xấu dò tìm tài khoản.
 
 ---
@@ -253,8 +270,10 @@ npm run dev
 - [x] Bước 6 — Thống kê & Biểu đồ (Recharts BarChart + PieChart)
 - [x] Bước 7 — Quản lý Ngân sách theo danh mục (Budget Tracker & Alerts)
 - [x] Bước 8 — Export Báo cáo CSV (Hỗ trợ chuẩn tiếng Việt trên Excel)
-- [ ] Bước 9 *(dự kiến)* — Nhắc nhở & thông báo tài chính định kỳ
-- [ ] Bước 10 *(dự kiến)* — Đa tiền tệ và chuyển tiền giữa các ví (Transfer)
+- [x] Bước 9 — Chuyển tiền giữa các ví (Wallet Transfer & Rollback)
+- [x] Bước 10 — Cài đặt Tài khoản & Đổi mật khẩu (Profile & Password Change)
+- [ ] Bước 11 *(dự kiến)* — Nhắc nhở & thông báo tài chính định kỳ
+- [ ] Bước 12 *(dự kiến)* — Quản lý danh mục chi tiêu tùy chỉnh (Custom Categories)
 
 ---
 
