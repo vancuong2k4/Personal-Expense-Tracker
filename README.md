@@ -2,7 +2,7 @@
 
 # 💰 Personal Expense Tracker
 
-**Ứng dụng quản lý tài chính cá nhân toàn diện** — Theo dõi thu chi, quản lý số dư ví, luân chuyển dòng tiền nội bộ, thiết lập ngân sách danh mục và phân tích tài chính với biểu đồ trực quan.
+**Ứng dụng quản lý tài chính cá nhân toàn diện** — Theo dõi thu chi, quản lý số dư ví, luân chuyển dòng tiền nội bộ, hóa đơn định kỳ, danh mục tùy biến, thiết lập ngân sách và phân tích tài chính với biểu đồ trực quan.
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev)
@@ -24,6 +24,8 @@
 | 🔄 **Chuyển tiền giữa các ví** | Luân chuyển dòng tiền giữa 2 ví (rút tiền mặt, thanh toán thẻ...), hỗ trợ phí chuyển và hoàn tác số dư nguyên tử |
 | 💸 **Giao dịch** | Ghi chép thu/chi với danh mục, ghi chú, tự động cập nhật số dư ví nguyên tử |
 | 🎯 **Quản lý Ngân sách** | Thiết lập hạn mức chi tiêu hàng tháng theo từng danh mục, theo dõi thanh tiến độ & cảnh báo vượt ngân sách |
+| 🔁 **Chi tiêu & Hóa đơn định kỳ** | Quản lý tiền nhà, điện nước, internet, lương, gói subscription với chu kỳ linh hoạt và cảnh báo khi đến hạn |
+| 🏷️ **Danh mục tùy biến** | Tạo danh mục thu/chi riêng mang đậm dấu ấn cá nhân với bộ Emoji picker, bảo vệ danh mục hệ thống |
 | 📥 **Xuất báo cáo CSV** | Xuất dữ liệu giao dịch ra file CSV chuẩn UTF-8 BOM, tương thích hoàn toàn tiếng Việt trên Excel |
 | 🔍 **Lọc & tìm kiếm** | Lọc giao dịch theo ví, danh mục, loại (thu/chi), khoảng thời gian và phân trang linh hoạt |
 | 📊 **Thống kê & Biểu đồ** | Biểu đồ cột thu/chi 6 tháng, biểu đồ tròn phân bổ chi tiêu theo danh mục với Recharts |
@@ -60,31 +62,34 @@ personal-expense-tracker/
 │       │   ├── authApi.js           # Login, Register, Profile, Change Password
 │       │   ├── walletApi.js         # CRUD Wallets
 │       │   ├── transactionApi.js    # CRUD Transactions
-│       │   ├── categoryApi.js       # Categories
+│       │   ├── categoryApi.js       # CRUD Categories
 │       │   ├── statsApi.js          # Stats & Charts data
 │       │   ├── budgetApi.js         # Budgets CRUD
-│       │   └── transferApi.js       # Wallet Transfers
+│       │   ├── transferApi.js       # Wallet Transfers
+│       │   └── recurringApi.js      # Recurring transactions / Subscriptions
 │       ├── components/
 │       │   ├── common/              # Button, Modal, Pagination, EmptyState, Badge, ConfirmDialog
 │       │   ├── charts/              # MonthlyChart, CategoryChart (Recharts)
 │       │   ├── layout/              # Sidebar, MainLayout, ProtectedRoute
 │       │   ├── transactions/        # TransactionForm, List, Item, Filter
 │       │   ├── wallets/             # WalletCard, WalletForm, TransferModal
-│       │   └── budgets/             # BudgetCard, BudgetForm, BudgetOverview
+│       │   ├── budgets/             # BudgetCard, BudgetForm, BudgetOverview
+│       │   └── recurring/           # RecurringCard, RecurringForm
 │       ├── context/                 # AuthContext (quản lý phiên đăng nhập toàn cục)
-│       ├── hooks/                   # useAuth, useWallets, useTransactions, useStats, useBudgets, useCategories
-│       ├── pages/                   # DashboardPage, WalletsPage, TransactionsPage, BudgetsPage, ProfilePage, Auth
+│       ├── hooks/                   # useAuth, useWallets, useTransactions, useStats, useBudgets, useCategories, useRecurring
+│       ├── pages/                   # DashboardPage, WalletsPage, TransactionsPage, BudgetsPage, RecurringPage, CategoriesPage, ProfilePage, Auth
 │       └── utils/                   # formatCurrency, formatDate, groupByDate, exportCSV
 │
 └── server/                          # Express Backend
     ├── database/
     │   ├── init.sql                 # Toàn bộ schema DDL + seed data
     │   ├── migration_budgets.sql    # Script bổ sung bảng budgets
-    │   └── migration_transfers.sql  # Script bổ sung bảng transfers
+    │   ├── migration_transfers.sql  # Script bổ sung bảng transfers
+    │   └── migration_recurring_and_custom_categories.sql # Migration danh mục & định kỳ
     └── src/
         ├── config/db.js             # PostgreSQL connection pool & query wrapper
         ├── middlewares/             # authMiddleware (JWT), errorHandler
-        ├── routes/                  # authRoutes, walletRoutes, transactionRoutes, statsRoutes, categoryRoutes, budgetRoutes, transferRoutes
+        ├── routes/                  # authRoutes, walletRoutes, transactionRoutes, statsRoutes, categoryRoutes, budgetRoutes, transferRoutes, recurringRoutes
         ├── controllers/             # Controller layer: validate request → gọi service → trả JSON
         └── services/                # Business logic layer + atomic database transactions
 ```
@@ -94,18 +99,20 @@ personal-expense-tracker/
 ## 🗃️ Database Schema
 
 ```sql
-users         -- Tài khoản người dùng (uuid PK, email UNIQUE, password_hash)
-wallets       -- Ví của user (uuid PK, user_id FK, name, type, balance)
-categories    -- Danh mục thu/chi (SERIAL PK, name, type, icon, is_default)
-transactions  -- Giao dịch (uuid PK, user_id, wallet_id, category_id, type, amount)
-budgets       -- Ngân sách chi tiêu tháng (uuid PK, user_id, category_id, amount, month)
-transfers     -- Chuyển tiền giữa các ví (uuid PK, user_id, from_wallet_id, to_wallet_id, amount, fee)
+users                   -- Tài khoản người dùng (uuid PK, email UNIQUE, password_hash)
+wallets                 -- Ví của user (uuid PK, user_id FK, name, type, balance)
+categories              -- Danh mục thu/chi (SERIAL PK, user_id FK, name, type, icon, is_default)
+transactions            -- Giao dịch (uuid PK, user_id, wallet_id, category_id, type, amount)
+budgets                 -- Ngân sách chi tiêu tháng (uuid PK, user_id, category_id, amount, month)
+transfers               -- Chuyển tiền giữa các ví (uuid PK, user_id, from_wallet_id, to_wallet_id, amount, fee)
+recurring_transactions  -- Chi phí & hóa đơn định kỳ (uuid PK, user_id, wallet_id, category_id, frequency, next_due_date)
 ```
 
 **Ràng buộc & Quan hệ:**
 - `users` → `wallets` → `transactions` ← `categories`
 - `users` & `categories` → `budgets` với ràng buộc duy nhất `UNIQUE (user_id, category_id, month)`
 - `wallets` (nguồn & đích) → `transfers` với kiểm tra ràng buộc `CONSTRAINT check_different_wallets CHECK (from_wallet_id <> to_wallet_id)`
+- `categories` hỗ trợ cả danh mục hệ thống (`user_id IS NULL AND is_default = true`) và danh mục riêng của người dùng.
 - Tất cả khóa ngoại liên kết với `ON DELETE CASCADE` đảm bảo toàn vẹn dữ liệu.
 
 ---
@@ -194,7 +201,7 @@ npm run dev
 | `PUT` | `/api/auth/profile` | Cập nhật thông tin cá nhân (Họ tên) | ✅ |
 | `PUT` | `/api/auth/change-password` | Đổi mật khẩu bảo mật (verify mật khẩu cũ) | ✅ |
 
-### Wallets
+### Wallets & Transfers
 
 | Method | Endpoint | Mô tả | Auth |
 |--------|----------|-------|------|
@@ -202,11 +209,6 @@ npm run dev
 | `POST` | `/api/wallets` | Tạo ví mới | ✅ |
 | `PUT` | `/api/wallets/:id` | Cập nhật thông tin ví | ✅ |
 | `DELETE` | `/api/wallets/:id` | Xóa ví | ✅ |
-
-### Wallet Transfers (Chuyển tiền giữa các ví)
-
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
 | `POST` | `/api/transfers` | Chuyển tiền giữa 2 ví (trừ ví nguồn + phí, cộng ví đích) | ✅ |
 | `GET` | `/api/transfers` | Lấy lịch sử chuyển tiền phân trang `?page=1&limit=20` | ✅ |
 | `DELETE` | `/api/transfers/:id` | Hủy lượt chuyển tiền & tự động hoàn trả số dư nguyên tử | ✅ |
@@ -220,32 +222,35 @@ npm run dev
 | `PUT` | `/api/transactions/:id` | Sửa giao dịch + điều chỉnh số dư | ✅ |
 | `DELETE` | `/api/transactions/:id` | Xóa giao dịch + hoàn trả số dư | ✅ |
 
-**Query parameters hỗ trợ:**
-```
-?wallet_id=<uuid>&category_id=<int>&type=income|expense&start_date=YYYY-MM-DD&end_date=YYYY-MM-DD&page=1&limit=15
-```
+### Recurring Transactions (Định kỳ & Hóa đơn)
 
-### Budgets (Quản lý Ngân sách)
+| Method | Endpoint | Mô tả | Auth |
+|--------|----------|-------|------|
+| `GET` | `/api/recurring` | Danh sách các khoản thu/chi định kỳ | ✅ |
+| `POST` | `/api/recurring` | Thiết lập khoản định kỳ mới (daily, weekly, monthly, yearly) | ✅ |
+| `PATCH` | `/api/recurring/:id/toggle` | Tạm dừng hoặc kích hoạt lại khoản định kỳ | ✅ |
+| `POST` | `/api/recurring/:id/execute` | Ghi nhận thành giao dịch thực tế & tự dời ngày đến hạn | ✅ |
+| `DELETE` | `/api/recurring/:id` | Xóa mẫu giao dịch định kỳ | ✅ |
+
+### Categories (Danh mục)
+
+| Method | Endpoint | Mô tả | Auth |
+|--------|----------|-------|------|
+| `GET` | `/api/categories` | Lấy tất cả danh mục (hệ thống + người dùng tạo) | ✅ |
+| `POST` | `/api/categories` | Tạo danh mục tùy chỉnh mới (loại, tên, icon) | ✅ |
+| `PUT` | `/api/categories/:id` | Chỉnh sửa tên/icon danh mục tùy chỉnh | ✅ |
+| `DELETE` | `/api/categories/:id` | Xóa danh mục tùy chỉnh (bảo vệ nếu đang có giao dịch) | ✅ |
+
+### Budgets & Statistics
 
 | Method | Endpoint | Mô tả | Auth |
 |--------|----------|-------|------|
 | `GET` | `/api/budgets` | Lấy danh sách ngân sách kèm tiến độ chi tiêu `?month=YYYY-MM` | ✅ |
 | `POST` | `/api/budgets` | Thiết lập hoặc cập nhật hạn mức ngân sách (UPSERT) | ✅ |
 | `DELETE` | `/api/budgets/:id` | Xóa ngân sách theo ID | ✅ |
-
-### Statistics (Thống kê)
-
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
 | `GET` | `/api/stats/overview` | Tổng quan tài chính tháng hiện tại | ✅ |
 | `GET` | `/api/stats/monthly` | Thu/chi theo tháng `?months=6` | ✅ |
 | `GET` | `/api/stats/by-category` | Phân bổ chi tiêu theo danh mục `?type=expense&month=YYYY-MM` | ✅ |
-
-### Categories
-
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| `GET` | `/api/categories` | Danh sách danh mục hệ thống | ✅ |
 
 ---
 
@@ -254,7 +259,7 @@ npm run dev
 - **Password Hashing** — Sử dụng thuật toán `bcryptjs` với salt rounds = 12, không bao giờ lưu trữ mật khẩu thuần.
 - **Phòng chống SQL Injection** — Sử dụng 100% Parameterized Queries (`$1, $2...`) thông qua PostgreSQL connection pool.
 - **Phòng chống IDOR (Insecure Direct Object Reference)** — Mọi truy vấn đọc/ghi/sửa/xóa đều bắt buộc đối chiếu với `user_id` giải mã từ JWT của người dùng hiện tại.
-- **Xác thực phiên tập trung** — `authMiddleware` xác thực Bearer JWT trước khi chuyển tiếp vào các API tài nguyên được bảo vệ.
+- **Bảo vệ tính toàn vẹn danh mục hệ thống** — Danh mục mặc định (`is_default = true`) được bảo vệ không thể bị xóa hoặc sửa bởi bất kỳ người dùng nào.
 - **Tính toàn vẹn dữ liệu (Atomic Multi-wallet Transactions)** — Sử dụng `BEGIN / COMMIT / ROLLBACK` của PostgreSQL khi tạo/sửa/xóa giao dịch hoặc chuyển quỹ giữa 2 ví, bảo đảm không bao giờ xảy ra lỗi sai lệch số dư.
 - **Chống Email Enumeration** — Thông báo lỗi đăng nhập đồng nhất ("Email hoặc mật khẩu không đúng") để tránh việc kẻ xấu dò tìm tài khoản.
 
@@ -272,8 +277,9 @@ npm run dev
 - [x] Bước 8 — Export Báo cáo CSV (Hỗ trợ chuẩn tiếng Việt trên Excel)
 - [x] Bước 9 — Chuyển tiền giữa các ví (Wallet Transfer & Rollback)
 - [x] Bước 10 — Cài đặt Tài khoản & Đổi mật khẩu (Profile & Password Change)
-- [ ] Bước 11 *(dự kiến)* — Nhắc nhở & thông báo tài chính định kỳ
-- [ ] Bước 12 *(dự kiến)* — Quản lý danh mục chi tiêu tùy chỉnh (Custom Categories)
+- [x] Bước 11 — Quản lý danh mục chi tiêu tùy chỉnh (Custom Categories)
+- [x] Bước 12 — Chi tiêu & Hóa đơn định kỳ (Recurring Subscriptions & Bills)
+- [ ] Bước 13 *(dự kiến)* — Chế độ tối (Dark Mode) & Hỗ trợ đa ngôn ngữ (i18n)
 
 ---
 
