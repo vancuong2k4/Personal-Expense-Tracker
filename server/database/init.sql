@@ -41,6 +41,7 @@ CREATE INDEX IF NOT EXISTS idx_wallets_user_id ON wallets(user_id);
 -- ============================================================
 CREATE TABLE IF NOT EXISTS categories (
   id          SERIAL PRIMARY KEY,
+  user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
   name        VARCHAR(100) NOT NULL,
   -- type: 'income' | 'expense'
   type        VARCHAR(10) NOT NULL,
@@ -48,6 +49,8 @@ CREATE TABLE IF NOT EXISTS categories (
   -- is_default = true: danh mục hệ thống, seed sẵn cho mọi user
   is_default  BOOLEAN NOT NULL DEFAULT true
 );
+
+CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id);
 
 -- ============================================================
 -- BẢNG 4: transactions
@@ -107,6 +110,27 @@ CREATE TABLE IF NOT EXISTS transfers (
 CREATE INDEX IF NOT EXISTS idx_transfers_user_date ON transfers(user_id, transfer_date DESC);
 CREATE INDEX IF NOT EXISTS idx_transfers_from_wallet ON transfers(from_wallet_id);
 CREATE INDEX IF NOT EXISTS idx_transfers_to_wallet ON transfers(to_wallet_id);
+
+-- ============================================================
+-- BẢNG 7: recurring_transactions (Giao dịch & Hóa đơn định kỳ)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS recurring_transactions (
+  id               UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id          UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  wallet_id        UUID NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
+  category_id      INT NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
+  type             VARCHAR(10) NOT NULL CHECK (type IN ('income', 'expense')),
+  amount           DECIMAL(15, 2) NOT NULL CHECK (amount > 0),
+  frequency        VARCHAR(20) NOT NULL DEFAULT 'monthly' CHECK (frequency IN ('daily', 'weekly', 'monthly', 'yearly')),
+  note             TEXT,
+  next_due_date    DATE NOT NULL,
+  last_executed_at TIMESTAMP WITH TIME ZONE,
+  is_active        BOOLEAN NOT NULL DEFAULT true,
+  created_at       TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_recurring_user_due ON recurring_transactions(user_id, next_due_date);
+CREATE INDEX IF NOT EXISTS idx_recurring_wallet ON recurring_transactions(wallet_id);
 
 -- ============================================================
 -- SEED DATA: Danh mục mặc định (chạy 1 lần)
