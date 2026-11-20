@@ -1,17 +1,42 @@
-const db = require('../config/db')
+const categoryService = require('../services/categoryService')
 
-// GET /api/categories — Lấy tất cả danh mục (dùng cho dropdown khi tạo giao dịch)
-// Categories là dữ liệu tĩnh (seed sẵn) nên không cần auth để đọc
-// Nhưng ta vẫn giữ auth để nhất quán với toàn bộ API
+// GET /api/categories
 exports.getCategories = async (req, res, next) => {
   try {
-    const result = await db.query(
-      `SELECT id, name, type, icon
-       FROM categories
-       WHERE is_default = true
-       ORDER BY type, name`
-    )
-    res.json(result.rows)
+    const categories = await categoryService.getCategories(req.user.id)
+    res.json(categories)
+  } catch (err) {
+    next(err)
+  }
+}
+
+// POST /api/categories
+exports.createCategory = async (req, res, next) => {
+  try {
+    const { name, type, icon } = req.body
+    const category = await categoryService.createCategory(req.user.id, { name, type, icon })
+    res.status(201).json(category)
+  } catch (err) {
+    next(err)
+  }
+}
+
+// PUT /api/categories/:id
+exports.updateCategory = async (req, res, next) => {
+  try {
+    const { name, icon } = req.body
+    const category = await categoryService.updateCategory(req.user.id, req.params.id, { name, icon })
+    res.json(category)
+  } catch (err) {
+    next(err)
+  }
+}
+
+// DELETE /api/categories/:id
+exports.deleteCategory = async (req, res, next) => {
+  try {
+    const result = await categoryService.deleteCategory(req.user.id, req.params.id)
+    res.json(result)
   } catch (err) {
     next(err)
   }
