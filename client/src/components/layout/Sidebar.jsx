@@ -7,6 +7,7 @@ const navItems = [
   { to: '/transactions', icon: '💸', label: 'Giao dịch' },
   { to: '/budgets',      icon: '🎯', label: 'Ngân sách' },
   { to: '/recurring',    icon: '🔁', label: 'Định kỳ' },
+  { to: '/categories',   icon: '🏷️', label: 'Danh mục' },
   { to: '/profile',      icon: '⚙️', label: 'Tài khoản' },
 ]
 

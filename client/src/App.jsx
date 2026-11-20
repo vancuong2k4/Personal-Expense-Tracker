@@ -7,6 +7,7 @@ import TransactionsPage from './pages/TransactionsPage'
 import BudgetsPage from './pages/BudgetsPage'
 import ProfilePage from './pages/ProfilePage'
 import RecurringPage from './pages/RecurringPage'
+import CategoriesPage from './pages/CategoriesPage'
 import ProtectedRoute from './components/layout/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="/transactions" element={<TransactionsPage />} />
             <Route path="/budgets" element={<BudgetsPage />} />
             <Route path="/recurring" element={<RecurringPage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
 
