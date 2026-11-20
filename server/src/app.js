@@ -8,6 +8,7 @@ const statsRoutes       = require('./routes/statsRoutes')
 const categoryRoutes    = require('./routes/categoryRoutes')
 const budgetRoutes      = require('./routes/budgetRoutes')
 const transferRoutes    = require('./routes/transferRoutes')
+const recurringRoutes   = require('./routes/recurringRoutes')
 const errorHandler      = require('./middlewares/errorHandler')
 
 const app = express()
@@ -23,6 +24,7 @@ app.use('/api/stats',        statsRoutes)
 app.use('/api/categories',   categoryRoutes)
 app.use('/api/budgets',      budgetRoutes)
 app.use('/api/transfers',    transferRoutes)
+app.use('/api/recurring',    recurringRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', timestamp: new Date() }))
