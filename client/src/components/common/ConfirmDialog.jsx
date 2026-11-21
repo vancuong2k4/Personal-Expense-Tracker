@@ -1,16 +1,16 @@
 export default function ConfirmDialog({ isOpen, onConfirm, onCancel, title, message, confirmLabel = 'Xác nhận', danger = false }) {
   if (!isOpen) return null
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-2xl shadow-2xl w-full max-w-sm p-6 transition-colors">
         <div className="text-center mb-5">
           <div className="text-4xl mb-3">{danger ? '⚠️' : '❓'}</div>
-          <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-          <p className="text-sm text-gray-500 mt-2">{message}</p>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{title}</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{message}</p>
         </div>
         <div className="flex gap-3">
           <button onClick={onCancel}
-            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             Hủy
           </button>
           <button onClick={onConfirm}
