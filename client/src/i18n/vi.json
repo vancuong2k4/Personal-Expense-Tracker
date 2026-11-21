@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "dashboard": "Tổng quan",
+    "wallets": "Ví của tôi",
+    "transactions": "Giao dịch",
+    "budgets": "Ngân sách",
+    "recurring": "Định kỳ",
+    "categories": "Danh mục",
+    "profile": "Tài khoản",
+    "logout": "Đăng xuất"
+  },
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "create": "Thêm mới",
+    "actions": "Hành động",
+    "loading": "Đang tải...",
+    "confirm": "Xác nhận",
+    "search": "Tìm kiếm...",
+    "filter": "Bộ lọc",
+    "reset": "Đặt lại",
+    "all": "Tất cả",
+    "income": "Thu nhập",
+    "expense": "Chi tiêu",
+    "status": "Trạng thái",
+    "date": "Ngày",
+    "amount": "Số tiền",
+    "note": "Ghi chú",
+    "category": "Danh mục",
+    "wallet": "Ví",
+    "themeLight": "Sáng",
+    "themeDark": "Tối",
+    "language": "Ngôn ngữ"
+  },
+  "dashboard": {
+    "title": "Tổng quan tài chính",
+    "subtitle": "Theo dõi thu chi và quản lý ngân sách cá nhân của bạn",
+    "totalBalance": "Tổng số dư",
+    "monthlyIncome": "Thu nhập tháng",
+    "monthlyExpense": "Chi tiêu tháng",
+    "netSavings": "Tiết kiệm ròng",
+    "recentTransactions": "Giao dịch gần đây",
+    "spendingByCategory": "Chi tiêu theo danh mục",
+    "monthlyTrends": "Xu hướng thu chi 6 tháng",
+    "noData": "Chưa có dữ liệu giao dịch"
+  },
+  "wallets": {
+    "title": "Quản lý ví",
+    "subtitle": "Danh sách các tài khoản ngân hàng và ví tiền của bạn",
+    "addWallet": "Thêm ví mới",
+    "transfer": "Chuyển tiền giữa các ví",
+    "balance": "Số dư",
+    "walletName": "Tên ví",
+    "walletType": "Loại ví"
+  },
+  "transactions": {
+    "title": "Lịch sử giao dịch",
+    "subtitle": "Xem và quản lý tất cả các khoản chi tiêu và thu nhập",
+    "addTransaction": "Thêm giao dịch",
+    "exportCsv": "Xuất CSV",
+    "filterByType": "Lọc theo loại",
+    "filterByCategory": "Lọc danh mục",
+    "filterByWallet": "Lọc ví",
+    "startDate": "Từ ngày",
+    "endDate": "Đến ngày"
+  },
+  "budgets": {
+    "title": "Ngân sách chi tiêu",
+    "subtitle": "Thiết lập định mức chi tiêu theo tháng và danh mục",
+    "addBudget": "Đặt ngân sách",
+    "remaining": "Còn lại",
+    "spent": "Đã chi",
+    "overBudget": "Vượt ngân sách",
+    "warning": "Cảnh báo vượt mức"
+  },
+  "recurring": {
+    "title": "Giao dịch định kỳ",
+    "subtitle": "Quản lý các hóa đơn và thu chi lặp lại tự động",
+    "addRecurring": "Thêm khoản định kỳ",
+    "frequency": "Chu kỳ",
+    "nextDueDate": "Ngày tiếp theo",
+    "autoExecute": "Thực thi"
+  },
+  "categories": {
+    "title": "Danh mục thu chi",
+    "subtitle": "Tùy biến các nhóm phân loại tài chính",
+    "addCategory": "Thêm danh mục",
+    "systemCategory": "Mặc định",
+    "customCategory": "Tự tạo"
+  },
+  "profile": {
+    "title": "Thông tin tài khoản",
+    "subtitle": "Quản lý thông tin cá nhân và bảo mật",
+    "fullName": "Họ và tên",
+    "email": "Email",
+    "changePassword": "Đổi mật khẩu",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmNewPassword": "Xác nhận mật khẩu mới"
+  }
+}

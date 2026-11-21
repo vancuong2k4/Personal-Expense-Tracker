@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "wallets": "My Wallets",
+    "transactions": "Transactions",
+    "budgets": "Budgets",
+    "recurring": "Recurring",
+    "categories": "Categories",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "actions": "Actions",
+    "loading": "Loading...",
+    "confirm": "Confirm",
+    "search": "Search...",
+    "filter": "Filter",
+    "reset": "Reset",
+    "all": "All",
+    "income": "Income",
+    "expense": "Expense",
+    "status": "Status",
+    "date": "Date",
+    "amount": "Amount",
+    "note": "Note",
+    "category": "Category",
+    "wallet": "Wallet",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "language": "Language"
+  },
+  "dashboard": {
+    "title": "Financial Dashboard",
+    "subtitle": "Track your cashflow and personal budget effectively",
+    "totalBalance": "Total Balance",
+    "monthlyIncome": "Monthly Income",
+    "monthlyExpense": "Monthly Expense",
+    "netSavings": "Net Savings",
+    "recentTransactions": "Recent Transactions",
+    "spendingByCategory": "Spending by Category",
+    "monthlyTrends": "6-Month Cashflow Trends",
+    "noData": "No transaction data yet"
+  },
+  "wallets": {
+    "title": "Wallet Management",
+    "subtitle": "Overview of your bank accounts and cash balances",
+    "addWallet": "New Wallet",
+    "transfer": "Transfer Funds",
+    "balance": "Balance",
+    "walletName": "Wallet Name",
+    "walletType": "Type"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "subtitle": "View and manage all your income and expenses",
+    "addTransaction": "New Transaction",
+    "exportCsv": "Export CSV",
+    "filterByType": "Filter by type",
+    "filterByCategory": "Filter category",
+    "filterByWallet": "Filter wallet",
+    "startDate": "Start date",
+    "endDate": "End date"
+  },
+  "budgets": {
+    "title": "Budget Planner",
+    "subtitle": "Set spending limits per category and month",
+    "addBudget": "New Budget",
+    "remaining": "Remaining",
+    "spent": "Spent",
+    "overBudget": "Over Budget",
+    "warning": "Warning threshold"
+  },
+  "recurring": {
+    "title": "Recurring Bills",
+    "subtitle": "Manage recurring expenses and scheduled subscriptions",
+    "addRecurring": "New Recurring",
+    "frequency": "Frequency",
+    "nextDueDate": "Next Due",
+    "autoExecute": "Execute"
+  },
+  "categories": {
+    "title": "Category Manager",
+    "subtitle": "Customize your personal expense classifications",
+    "addCategory": "New Category",
+    "systemCategory": "Default",
+    "customCategory": "Custom"
+  },
+  "profile": {
+    "title": "Account Profile",
+    "subtitle": "Manage profile information and account security",
+    "fullName": "Full Name",
+    "email": "Email",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password"
+  }
+}
